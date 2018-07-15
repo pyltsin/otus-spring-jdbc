@@ -23,7 +23,7 @@ public class AuthorDaoImpl extends AbstractDaoImpl<Author> implements AuthorDao 
     }
 
     @Override
-    public Author create(Author author) {
+    public Author insert(Author author) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource parameters = new BeanPropertySqlParameterSource(author);
         jdbcOperations.update("insert into author(name) values(:name)", parameters, keyHolder);

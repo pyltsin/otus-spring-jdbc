@@ -9,7 +9,7 @@ public interface AbstractDao<T extends Ids> {
 
     List<T> findAll();
 
-    T create(T author);
+    T insert(T author);
 
     T update(T author);
 
