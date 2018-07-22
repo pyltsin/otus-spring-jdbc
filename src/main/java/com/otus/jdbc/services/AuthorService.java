@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface AuthorService {
 
-    List<Author> findAll();
+    List<Author> getAll();
 
-    List<Author> getByBook(long id);
+    List<Author> getByBook(int id);
 
-    Author find(long id);
+    Author get(int id);
 
     Author insert(Author author);
 
     Author update(Author author);
 
-    void delete(Author author);
+    void delete(int id);
 }
