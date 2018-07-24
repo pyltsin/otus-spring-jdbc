@@ -1,22 +1,21 @@
 package com.otus.jdbc.services;
 
-import com.otus.jdbc.model.Author;
 import com.otus.jdbc.model.Book;
 
 import java.util.List;
 
 public interface BookService {
-    List<Book> findAll();
+    List<Book> getAll();
 
-    List<Book> getByAuthor(long id);
+    List<Book> getByAuthor(int id);
 
-    Book insert(Book book);
+    Book insert(Book book, List<Integer> authorIds);
+
+    Book update(int idBook, List<Integer> authorIds);
 
     Book update(Book book);
 
-    void insertToAutor(Book book, Author author);
+    void delete(int id);
 
-    void delete(Book book);
-
-    Book find(Long id);
+    Book get(int id);
 }

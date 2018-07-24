@@ -1,38 +1,42 @@
 package com.otus.jdbc.model;
 
 import lombok.Data;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import javax.persistence.*;
 import java.util.List;
 
-public class Book implements Ids {
-    private Long id;
+@Data
+@Entity
+@ToString
+@EqualsAndHashCode(of = "id")
+public class Book {
 
-    @Override
-    public Long getId() {
-        return id;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String description;
 
-    public String getDescription() {
-        return description;
-    }
+    @Enumerated(EnumType.STRING)
+    private Genre genre;
 
-    public void setDescription(String description) {
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "AUTHOR_TO_BOOK", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
+    private List<Author> author;
+
+    @OneToMany(mappedBy = "book", cascade = {CascadeType.REMOVE})
+    @ToString.Exclude
+    private List<Comment> comments;
+
+    public Book(String description, Genre genre) {
         this.description = description;
-    }
-
-    public Genre getGenre() {
-        return genre;
-    }
-
-    public void setGenre(Genre genre) {
         this.genre = genre;
     }
 
-    private String description;
-    private Genre genre;
+    public Book() {
+
+    }
 }

@@ -1,64 +1,74 @@
 package com.otus.jdbc.services;
 
-import com.otus.jdbc.dao.AuthorToBookDao;
-import com.otus.jdbc.dao.BookDao;
 import com.otus.jdbc.model.Author;
 import com.otus.jdbc.model.Book;
+import com.otus.jdbc.repository.AuthorRepository;
+import com.otus.jdbc.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
 @Service
+@Transactional(rollbackOn = Throwable.class)
 public class BookServiceImpl implements BookService {
 
-    private final BookDao bookDao;
+    private final AuthorRepository authorRepository;
 
-    private final AuthorToBookDao authorToBookDao;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public BookServiceImpl(BookDao bookDao, AuthorToBookDao authorToBookDao) {
-        this.bookDao = bookDao;
-        this.authorToBookDao = authorToBookDao;
-    }
-
-
-    @Override
-    public List<Book> findAll() {
-        return bookDao.findAll();
+    public BookServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
     }
 
     @Override
-    public List<Book> getByAuthor(long id) {
-        List<Long> bookByAuthor = authorToBookDao.getBookByAuthor(id);
-        return bookByAuthor.stream().map(bookId -> bookDao.findById(bookId)).collect(toList());
+    public List<Book> getAll() {
+        return bookRepository.getAll();
     }
 
     @Override
-    public Book insert(Book book) {
-        return bookDao.insert(book);
+    public List<Book> getByAuthor(int id) {
+        return bookRepository.getByAuthorId(id);
+    }
+
+    @Override
+    public Book insert(Book book, List<Integer> authorIds) {
+        book.setAuthor(getAuthors(authorIds));
+        return bookRepository.save(book);
+    }
+
+    @Override
+    public Book update(int idBook, List<Integer> authorIds) {
+        Book reference = bookRepository.getReference(idBook);
+        reference.setAuthor(getAuthors(authorIds));
+        return bookRepository.save(reference);
     }
 
     @Override
     public Book update(Book book) {
-        return bookDao.update(book);
+        Book reference = bookRepository.getReference(book.getId());
+        reference.setDescription(book.getDescription());
+        reference.setGenre(book.getGenre());
+        return bookRepository.update(reference);
+    }
+
+    private List<Author> getAuthors(List<Integer> authorIds) {
+        return authorIds.stream().map(authorRepository::getReference).collect(toList());
     }
 
     @Override
-    public void insertToAutor(Book book, Author author) {
-        authorToBookDao.insert(book.getId(), author.getId());
+    public void delete(int id) {
+        Book reference = bookRepository.getReference(id);
+        bookRepository.delete(reference);
     }
 
     @Override
-    public void delete(Book book) {
-        authorToBookDao.deleteByBook(book.getId());
-        bookDao.delete(book);
-    }
-
-    @Override
-    public Book find(Long id) {
-        return bookDao.findById(id);
+    public Book get(int id) {
+        return bookRepository.getById(id);
     }
 }

@@ -1,3 +1,4 @@
+DROP table if exists COMMENT;
 DROP TABLE IF EXISTS AUTHOR_TO_BOOK;
 DROP TABLE IF EXISTS GENRE;
 DROP TABLE IF EXISTS BOOK;
@@ -13,9 +14,9 @@ CREATE TABLE AUTHOR (
 );
 
 CREATE TABLE Book (
-  ID         integer primary key auto_increment,
+  ID          integer primary key auto_increment,
   description varchar(2000),
-  genre      varchar(2000) references GENRE (ID)
+  genre       varchar(2000) references GENRE (ID)
 );
 
 CREATE Table AUTHOR_TO_BOOK (
@@ -25,3 +26,10 @@ CREATE Table AUTHOR_TO_BOOK (
 
 alter table AUTHOR_TO_BOOK
   add primary key (book_id, author_id);
+
+CREATE TABLE COMMENT (
+  ID      integer primary key auto_increment,
+  BOOK_ID integer not null references Book (ID),
+  COMMENT varchar(2000)
+);
+
