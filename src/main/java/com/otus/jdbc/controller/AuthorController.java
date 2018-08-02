@@ -42,5 +42,8 @@ public class AuthorController {
         authorService.update(author);
     }
 
-
+    @ShellMethod(value = "tran")
+    void transact() throws Exception {
+        authorService.testTransact();
+    }
 }

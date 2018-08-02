@@ -1,9 +1,10 @@
 package com.otus.jdbc.services;
 
+import com.google.common.collect.Lists;
 import com.otus.jdbc.model.Author;
 import com.otus.jdbc.model.Book;
-import com.otus.jdbc.repository.AuthorRepository;
-import com.otus.jdbc.repository.BookRepository;
+import com.otus.jdbc.repository.AuthorDataJpaRepository;
+import com.otus.jdbc.repository.BookDataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,24 +17,25 @@ import static java.util.stream.Collectors.toList;
 @Transactional(rollbackOn = Throwable.class)
 public class BookServiceImpl implements BookService {
 
-    private final AuthorRepository authorRepository;
+    private final AuthorDataJpaRepository authorRepository;
 
-    private final BookRepository bookRepository;
+    private final BookDataJpaRepository bookRepository;
 
     @Autowired
-    public BookServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository) {
+    public BookServiceImpl(AuthorDataJpaRepository authorRepository,
+                           BookDataJpaRepository bookRepository) {
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
     }
 
     @Override
     public List<Book> getAll() {
-        return bookRepository.getAll();
+        return bookRepository.findAll();
     }
 
     @Override
     public List<Book> getByAuthor(int id) {
-        return bookRepository.getByAuthorId(id);
+        return authorRepository.findById(id).map(bookRepository::getAllByAuthor).orElse(Lists.newArrayList());
     }
 
     @Override
@@ -44,31 +46,30 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book update(int idBook, List<Integer> authorIds) {
-        Book reference = bookRepository.getReference(idBook);
+        Book reference = bookRepository.getOne(idBook);
         reference.setAuthor(getAuthors(authorIds));
         return bookRepository.save(reference);
     }
 
     @Override
     public Book update(Book book) {
-        Book reference = bookRepository.getReference(book.getId());
+        Book reference = bookRepository.getOne(book.getId());
         reference.setDescription(book.getDescription());
         reference.setGenre(book.getGenre());
-        return bookRepository.update(reference);
+        return bookRepository.save(reference);
     }
 
     private List<Author> getAuthors(List<Integer> authorIds) {
-        return authorIds.stream().map(authorRepository::getReference).collect(toList());
+        return authorIds.stream().map(authorRepository::getOne).collect(toList());
     }
 
     @Override
     public void delete(int id) {
-        Book reference = bookRepository.getReference(id);
-        bookRepository.delete(reference);
+        bookRepository.deleteById(id);
     }
 
     @Override
     public Book get(int id) {
-        return bookRepository.getById(id);
+        return bookRepository.getOne(id);
     }
 }

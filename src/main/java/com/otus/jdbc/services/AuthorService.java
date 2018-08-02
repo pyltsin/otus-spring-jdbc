@@ -18,4 +18,8 @@ public interface AuthorService {
     Author update(Author author);
 
     void delete(int id);
+
+    void testTransact() throws Exception;
+
+    void inner() throws Exception;
 }
