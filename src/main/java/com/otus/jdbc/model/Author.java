@@ -1,20 +1,22 @@
 package com.otus.jdbc.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import java.util.List;
 
 @Data
 @Getter
-@Entity
 @ToString
+@Document
 public class Author {
     public Author() {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
@@ -23,7 +25,5 @@ public class Author {
         this.name = name;
     }
 
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "author")
-    private List<Book> books;
+    private List<Integer> books;
 }

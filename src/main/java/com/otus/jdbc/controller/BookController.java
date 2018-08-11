@@ -2,7 +2,6 @@ package com.otus.jdbc.controller;
 
 import com.otus.jdbc.model.Book;
 import com.otus.jdbc.model.Genre;
-import com.otus.jdbc.services.AuthorService;
 import com.otus.jdbc.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
@@ -18,17 +17,17 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @ShellMethod(value = "get all books")
+    @ShellMethod(value = "find all books")
     void getAllBooks() {
         bookService.getAll().forEach(System.out::println);
     }
 
-    @ShellMethod(value = "get books by author id")
+    @ShellMethod(value = "find books by authors id")
     void getBooksAuthor(int id) {
         bookService.getByAuthor(id).forEach(System.out::println);
     }
 
-    @ShellMethod(value = "get book by id")
+    @ShellMethod(value = "find book by id")
     void getBookById(int id) {
         Book book = bookService.get(id);
         System.out.println(book);

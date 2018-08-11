@@ -10,7 +10,6 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -18,7 +17,6 @@ import java.util.List;
         ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false",
         InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false"
 })
-@Transactional
 public class AuthorServiceTest {
 
     @Autowired
@@ -41,14 +39,14 @@ public class AuthorServiceTest {
     public void insertGetUpdate() {
         String name = "vasya";
         Author vasya = authorService.insert(new Author(name));
-        Author author = authorService.get(vasya.getId());
+        Author author = authorService.find(vasya.getId());
         Assert.assertEquals(name, author.getName());
 
         String nameUpdate = "fedya";
         author.setName(nameUpdate);
         authorService.update(author);
 
-        author = authorService.get(vasya.getId());
+        author = authorService.find(vasya.getId());
         Assert.assertEquals(nameUpdate, author.getName());
     }
 
