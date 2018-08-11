@@ -1,11 +1,10 @@
 package com.otus.jdbc.repository;
 
-import com.otus.jdbc.model.Author;
 import com.otus.jdbc.model.Book;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface BookDataJpaRepository extends JpaRepository<Book, Integer> {
-    List<Book> getAllByAuthor(Author author);
+public interface BookDataJpaRepository extends MongoRepository<Book, Integer> {
+    List<Book> getAllByAuthorsContains(Integer author);
 }

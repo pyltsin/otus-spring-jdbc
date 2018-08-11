@@ -1,14 +1,12 @@
 package com.otus.jdbc.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Entity
+@Document
 @ToString
 public class Comment {
 
@@ -20,13 +18,9 @@ public class Comment {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    @ToString.Exclude
-    private Book book;
+    private Integer book;
 
     private String comment;
 }

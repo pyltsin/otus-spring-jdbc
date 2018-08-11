@@ -12,7 +12,6 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -23,7 +22,6 @@ import static com.google.common.collect.Lists.newArrayList;
         ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false",
         InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false"
 })
-@Transactional
 public class BookServiceImplTest {
 
     @Autowired
@@ -77,10 +75,8 @@ public class BookServiceImplTest {
 
         bookService.update(warAndPiece.getId(), newArrayList(tolstoy2.getId()));
         Book book = bookService.get(warAndPiece.getId());
-        Assert.assertEquals(1, book.getAuthor().size());
-        Assert.assertEquals(book.getAuthor().get(0), tolstoy2);
-
-
+        Assert.assertEquals(1, book.getAuthors().size());
+        Assert.assertEquals((int)book.getAuthors().get(0), (int)tolstoy2.getId());
     }
 
     @Test

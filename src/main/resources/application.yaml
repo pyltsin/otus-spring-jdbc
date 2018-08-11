@@ -1,18 +1,7 @@
 spring:
-  jpa:
-    database: h2
-    generate-ddl: false
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: trace
-        type: trace
-        generate_statistics: trace
+  data:
+    mongodb:
+      authentication-database: admin
+      database: test
+      host: localhost
+      port: 27017

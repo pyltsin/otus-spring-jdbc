@@ -11,39 +11,34 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
 
-    @ShellMethod(value = "create author")
+    @ShellMethod(value = "create authors")
     void createAuthor(String name) {
         Author author = new Author();
         author.setName(name);
         authorService.insert(author);
     }
 
-    @ShellMethod(value = "get all authors")
+    @ShellMethod(value = "find all authors")
     void getAllAuthors() {
         authorService.getAll().forEach(System.out::println);
     }
 
 
-    @ShellMethod(value = "get author by id")
+    @ShellMethod(value = "find authors by id")
     void getAuthorById(int id) {
-        System.out.println(authorService.get(id));
+        System.out.println(authorService.find(id));
     }
 
-    @ShellMethod(value = "delete author by id")
+    @ShellMethod(value = "delete authors by id")
     void deleteAuthor(int id) {
         authorService.delete(id);
     }
 
-    @ShellMethod(value = "update author name")
+    @ShellMethod(value = "update authors name")
     void updateAuthor(int id, String name) {
         Author author = new Author();
         author.setName(name);
         author.setId(id);
         authorService.update(author);
-    }
-
-    @ShellMethod(value = "tran")
-    void transact() throws Exception {
-        authorService.testTransact();
     }
 }

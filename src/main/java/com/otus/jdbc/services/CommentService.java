@@ -12,8 +12,5 @@ public interface CommentService {
 
     Comment update(Comment comment);
 
-    //проверял работать ли менеджмент
-    Comment update2(Comment comment);
-
     void delete(int  id);
 }
