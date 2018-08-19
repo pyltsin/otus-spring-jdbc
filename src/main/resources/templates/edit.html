@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit author</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Person edition -->
+<form id="edit-form" action="/save" th:action="@{/save}" method="post">
+    <h1>Author Info:</h1>
+
+    <div class="row" th:if="${author!=null}">
+        <label>ID:&nbsp;</label>
+        <span th:text="${author.id}">1</span>
+    </div>
+
+    <div class="row">
+        <label>Name:&nbsp;</label>
+        <input name="name" type="text" th:value="${author!=null}? ${author.name}: 'enter name'"/>
+        <input hidden="hidden" name="id" value="" th:value="${author==null? null: author.id}">
+    </div>
+
+    <div class="row">
+        <button type="submit" th:value="${author==null}?save:update">Save</button>
+    </div>
+</form>
+
+</body>
+</html>
