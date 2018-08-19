@@ -1,9 +1,13 @@
 package com.otus.jdbc.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Data
 @Getter
@@ -22,8 +26,4 @@ public class Author {
     public Author(String name) {
         this.name = name;
     }
-
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "author")
-    private List<Book> books;
 }

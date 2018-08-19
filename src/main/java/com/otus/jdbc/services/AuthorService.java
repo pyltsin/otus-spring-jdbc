@@ -1,15 +1,12 @@
 package com.otus.jdbc.services;
 
 import com.otus.jdbc.model.Author;
-import com.otus.jdbc.model.Book;
 
 import java.util.List;
 
 public interface AuthorService {
 
     List<Author> getAll();
-
-    List<Author> getByBook(int id);
 
     Author get(int id);
 
@@ -19,7 +16,5 @@ public interface AuthorService {
 
     void delete(int id);
 
-    void testTransact() throws Exception;
-
-    void inner() throws Exception;
+    void save(Integer id, String name);
 }
