@@ -2,8 +2,9 @@ package com.otus.jdbc.controller;
 
 import com.otus.jdbc.model.Author;
 import com.otus.jdbc.services.AuthorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class AuthorController {
 
     @Autowired
@@ -19,18 +21,19 @@ public class AuthorController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/authors")
     public List<Author> getAllAuthor() {
+        log.debug("authors");
         return authorService.getAll();
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/save")
-    public String save(@RequestParam(value = "id", required = false) Integer id, @RequestParam("name") String name, Model model) {
+    @RequestMapping(method = RequestMethod.POST, path = "/authors")
+    public ResponseEntity save(@RequestParam(value = "id", required = false) Integer id, @RequestParam("name") String name) {
         authorService.save(id, name);
-        return "redirect:/";
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/delete")
-    public String deleteAuthor(@RequestParam("id") int id, Model model) {
+    @RequestMapping(method = RequestMethod.DELETE, path = "/authors")
+    public ResponseEntity deleteAuthor(@RequestParam("id") Integer id) {
         authorService.delete(id);
-        return "redirect:/";
+        return ResponseEntity.ok().build();
     }
 }
