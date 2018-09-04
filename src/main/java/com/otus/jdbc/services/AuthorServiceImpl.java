@@ -5,18 +5,18 @@ import com.otus.jdbc.repository.AuthorDataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorDataJpaRepository authorRepository;
+    private final NextSequenceService nextSequenceService;
 
     @Autowired
-    public AuthorServiceImpl(AuthorDataJpaRepository authorRepository) {
+    public AuthorServiceImpl(AuthorDataJpaRepository authorRepository, NextSequenceService nextSequenceService) {
         this.authorRepository = authorRepository;
+        this.nextSequenceService = nextSequenceService;
     }
 
     @Override
@@ -31,6 +31,9 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author insert(Author author) {
+        if (author.getId() == 0) {
+            author.setId(nextSequenceService.getNextSequence("author"));
+        }
         return authorRepository.save(author);
     }
 
