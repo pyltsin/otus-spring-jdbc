@@ -2,50 +2,32 @@ package com.otus.jdbc.controller;
 
 import com.otus.jdbc.model.Author;
 import com.otus.jdbc.services.AuthorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
+@Slf4j
 public class AuthorController {
 
     @Autowired
     private AuthorService authorService;
 
-    @RequestMapping(method = RequestMethod.POST, path = "/save")
-    public String save(@RequestParam(value = "id", required = false) Integer id, @RequestParam("name") String name, Model model) {
-        authorService.save(id, name);
-        return "redirect:/";
+    @GetMapping("/authors")
+    public Flux<Author> getAllAuthor() {
+        log.debug("authors");
+        return authorService.getAll();
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/")
-    public String getAllAuthors(Model model) {
-        populateModel(model);
-        return "listAuthors";
+    @RequestMapping(method = RequestMethod.POST, path = "/authors")
+    public Mono<Author> save(@RequestParam(value = "id", required = false) Integer id, @RequestParam("name") String name) {
+        return authorService.save(id, name);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/create")
-    public String create(Model model) {
-        return "edit";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, path = "/edit")
-    public String edit(Model model, @RequestParam("id") int id) {
-        Author author = authorService.get(id);
-        model.addAttribute("author", author);
-        return "edit";
-    }
-
-    @RequestMapping(method = RequestMethod.POST, path = "/delete")
-    public String deleteAuthor(@RequestParam("id") int id, Model model) {
-        authorService.delete(id);
-        return "redirect:/";
-    }
-
-    private void populateModel(Model model) {
-        model.addAttribute("authors", authorService.getAll());
+    @RequestMapping(method = RequestMethod.DELETE, path = "/authors")
+    public Mono<Void> deleteAuthor(@RequestParam("id") Integer id) {
+        return authorService.delete(id);
     }
 }

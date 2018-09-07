@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 @RunWith(SpringRunner.class)
-@Transactional
 @SpringBootTest
 public class AuthorServiceTest {
 
@@ -21,38 +21,36 @@ public class AuthorServiceTest {
 
     @Test
     public void insertAndGetAll() {
-        List<Author> before = authorService.getAll();
+        List<Author> before = authorService.getAll().collectList().block();
 
-        Author tt1 = authorService.insert(new Author("tt1"));
-        Author tt2 = authorService.insert(new Author("tt2"));
+        Author tt1 = authorService.insert(new Author("tt1")).block();
+        Author tt2 = authorService.insert(new Author("tt2")).block();
 
-        List<Author> all = authorService.getAll();
-        Assert.assertTrue(all.contains(tt1));
+        List<Author> all = authorService.getAll().collectList().block();
+        Assert.assertTrue(requireNonNull(all).contains(tt1));
         Assert.assertTrue(all.contains(tt2));
-        Assert.assertEquals(2, all.size() - before.size());
+        Assert.assertEquals(2, all.size() - requireNonNull(before).size());
     }
 
     @Test
     public void insertGetUpdate() {
         String name = "vasya";
-        Author vasya = authorService.insert(new Author(name));
-        Author author = authorService.get(vasya.getId());
-        Assert.assertEquals(name, author.getName());
+        Author vasya = authorService.insert(new Author(name)).block();
+        Author author = authorService.get(requireNonNull(vasya).getId()).block();
+        Assert.assertEquals(name, requireNonNull(author).getName());
 
         String nameUpdate = "fedya";
         author.setName(nameUpdate);
-        authorService.update(author);
+        Author afterUpdate = authorService.update(author).block();
 
-        author = authorService.get(vasya.getId());
-        Assert.assertEquals(nameUpdate, author.getName());
+        Assert.assertEquals(nameUpdate, afterUpdate.getName());
     }
 
     @Test
     public void delete() {
-        List<Author> all = authorService.getAll();
-        Author vasya = authorService.insert(new Author("test"));
-        authorService.delete(vasya.getId());
-        List<Author> allAfterDelete = authorService.getAll();
-        Assert.assertArrayEquals(all.toArray(), allAfterDelete.toArray());
+        Author vasya = authorService.insert(new Author("vasya4")).block();
+        authorService.delete(vasya.getId()).block();
+        List<Author> allAfterDelete = authorService.getAll().collectList().block();
+        Assert.assertFalse(allAfterDelete.contains(vasya));
     }
 }
