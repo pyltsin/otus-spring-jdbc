@@ -7,31 +7,28 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Created by Pyltsin on 25.08.2018.
  */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthorControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
+    ApplicationContext context;
+    @Autowired
+    private WebTestClient webTestClient;
     @Autowired
     private AuthorService authorService;
 
@@ -40,60 +37,49 @@ public class AuthorControllerTest {
 
     @Test
     public void getAll() throws Exception {
-        List<Author> authors = authorService.getAll();
-
-        mockMvc.perform(get("/authors"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(authors)));
+        List<Author> authors = authorService.getAll().collectList().block();
+        webTestClient.get().uri("/authors")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().json(objectMapper.writeValueAsString(authors));
     }
 
     @Test
-    public void deleteAuthor() throws Exception {
+    public void deleteAuthor() {
 
         Author author = new Author("Pelevin");
-        Author authorFromDB = authorService.insert(author);
+        Author authorFromDB = authorService.insert(author).block();
 
-        mockMvc.perform(delete("/authors").param("id", String.valueOf(authorFromDB.getId())))
-                .andDo(print())
-                .andExpect(status().isOk());
+        webTestClient
+                .delete()
+                .uri(
+                        uriBuilder -> uriBuilder.path("/authors")
+                                .queryParam("id", authorFromDB.getId())
+                                .build())
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus().isOk();
 
-        Assert.assertFalse(authorService.getAll().contains(authorFromDB));
+        Assert.assertFalse(requireNonNull(authorService.getAll().collectList().block()).contains(authorFromDB));
     }
 
-
-    @Test
-    public void updateAuthor() throws Exception {
-
-        Author author = new Author("Pelevin");
-        Author authorFromDB = authorService.insert(author);
-
-        String nameAfterUpdate = "Pelevin2";
-        authorFromDB.setName(nameAfterUpdate);
-        mockMvc.perform(post("/authors")
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("id", String.valueOf(authorFromDB.getId()))
-                .param("name", authorFromDB.getName()))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-        Assert.assertEquals(authorService.get(authorFromDB.getId()).getName(), nameAfterUpdate);
-    }
 
     @Test
     public void createAuthor() throws Exception {
 
-        List<Author> allBeforeInsert = authorService.getAll();
+        List<Author> allBeforeInsert = authorService.getAll().collectList().block();
         String testName = "TEST";
-        mockMvc.perform(post("/authors")
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("name", testName))
-                .andDo(print())
-                .andExpect(status().isOk());
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder.path("/authors").queryParam("name", testName).build())
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus().isOk();
 
-        List<Author> allAfterInsert = authorService.getAll();
+        List<Author> allAfterInsert = authorService.getAll().collectList().block();
 
-        allAfterInsert.removeAll(allBeforeInsert);
+        requireNonNull(allAfterInsert).removeAll(requireNonNull(allBeforeInsert));
 
         Assert.assertEquals(allAfterInsert.size(), 1);
         Assert.assertEquals(allAfterInsert.get(0).getName(), testName);

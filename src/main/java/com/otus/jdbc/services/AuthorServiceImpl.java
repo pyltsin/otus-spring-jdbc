@@ -1,36 +1,36 @@
 package com.otus.jdbc.services;
 
 import com.otus.jdbc.model.Author;
-import com.otus.jdbc.repository.AuthorDataJpaRepository;
+import com.otus.jdbc.repository.AuthorMongoJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
 
-    private final AuthorDataJpaRepository authorRepository;
+    private final AuthorMongoJpaRepository authorRepository;
     private final NextSequenceService nextSequenceService;
 
     @Autowired
-    public AuthorServiceImpl(AuthorDataJpaRepository authorRepository, NextSequenceService nextSequenceService) {
+    public AuthorServiceImpl(AuthorMongoJpaRepository authorRepository, NextSequenceService nextSequenceService) {
         this.authorRepository = authorRepository;
         this.nextSequenceService = nextSequenceService;
     }
 
     @Override
-    public List<Author> getAll() {
+    public Flux<Author> getAll() {
         return authorRepository.findAll();
     }
 
     @Override
-    public Author get(int id) {
-        return authorRepository.findById(id).get();
+    public Mono<Author> get(int id) {
+        return authorRepository.findById(id);
     }
 
     @Override
-    public Author insert(Author author) {
+    public Mono<Author> insert(Author author) {
         if (author.getId() == 0) {
             author.setId(nextSequenceService.getNextSequence("author"));
         }
@@ -38,28 +38,27 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author update(Author author) {
-        Author authorFromDb = get(author.getId());
-        authorFromDb.setName(author.getName());
-        return authorRepository.save(authorFromDb);
+    public Mono<Author> update(Author author) {
+        Mono<Author> authorFromDb = get(author.getId());
+        return authorFromDb.doOnNext(_a -> _a.setName(author.getName())).doOnNext(authorRepository::save);
     }
 
     @Override
-    public void delete(int id) {
-        authorRepository.deleteById(id);
+    public Mono<Void> delete(int id) {
+        return authorRepository.deleteById(id);
     }
 
     @Override
-    public void save(Integer id, String name) {
+    public Mono<Author> save(Integer id, String name) {
         if (id != null) {
             Author author = new Author();
             author.setName(name);
             author.setId(id);
-            update(author);
+            return update(author);
         } else {
             Author author = new Author();
             author.setName(name);
-            insert(author);
+            return insert(author);
         }
     }
 }

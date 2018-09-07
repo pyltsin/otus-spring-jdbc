@@ -1,20 +1,20 @@
 package com.otus.jdbc.services;
 
 import com.otus.jdbc.model.Author;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface AuthorService {
 
-    List<Author> getAll();
+    Flux<Author> getAll();
 
-    Author get(int id);
+    Mono<Author> get(int id);
 
-    Author insert(Author author);
+    Mono<Author> insert(Author author);
 
-    Author update(Author author);
+    Mono<Author> update(Author author);
 
-    void delete(int id);
+    Mono<Void> delete(int id);
 
-    void save(Integer id, String name);
+    Mono<Author> save(Integer id, String name);
 }
