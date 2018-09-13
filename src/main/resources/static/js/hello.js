@@ -1,13 +1,13 @@
 $(function () {
 
-    $('form').on('submit', function (e) {
+    $('#edit-form').on('submit', function (e) {
 
         e.preventDefault();
-        console.log($('form').serialize());
+        console.log($('#edit-form').serialize());
         $.ajax({
             type: 'post',
             url: 'authors',
-            data: $('form').serialize(),
+            data: $('#edit-form').serialize(),
             complete: function () {
                 $("#edit").hide();
                 $("#authors").show();
