@@ -3,6 +3,7 @@ package com.otus.jdbc.services;
 import com.otus.jdbc.model.Author;
 import com.otus.jdbc.repository.AuthorDataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @PostFilter("hasPermission(filterObject, 'READ')")
     public List<Author> getAll() {
         return authorRepository.findAll();
     }
