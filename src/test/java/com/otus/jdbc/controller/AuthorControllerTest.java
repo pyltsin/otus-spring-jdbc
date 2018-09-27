@@ -2,6 +2,7 @@ package com.otus.jdbc.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otus.jdbc.model.Author;
+import com.otus.jdbc.repository.AuthorDataJpaRepository;
 import com.otus.jdbc.services.AuthorService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,10 +31,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AuthorControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private AuthorDataJpaRepository authorRepository;
 
     @Autowired
     private AuthorService authorService;
@@ -39,8 +47,9 @@ public class AuthorControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser(username = "user1")
     public void getAll() throws Exception {
-        List<Author> authors = authorService.getAll();
+        List<Author> authors = authorRepository.findAllById(Arrays.asList(2, 3));
 
         mockMvc.perform(get("/authors"))
                 .andDo(print())
@@ -49,6 +58,7 @@ public class AuthorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     public void deleteAuthor() throws Exception {
 
         Author author = new Author("Pelevin");
@@ -58,11 +68,12 @@ public class AuthorControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Assert.assertFalse(authorService.getAll().contains(authorFromDB));
+        Assert.assertFalse(authorRepository.findAll().contains(authorFromDB));
     }
 
 
     @Test
+    @WithMockUser(roles = "USER")
     public void updateAuthor() throws Exception {
 
         Author author = new Author("Pelevin");
@@ -81,9 +92,10 @@ public class AuthorControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     public void createAuthor() throws Exception {
 
-        List<Author> allBeforeInsert = authorService.getAll();
+        List<Author> allBeforeInsert = authorRepository.findAll();
         String testName = "TEST";
         mockMvc.perform(post("/authors")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,12 +103,11 @@ public class AuthorControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        List<Author> allAfterInsert = authorService.getAll();
+        List<Author> allAfterInsert = authorRepository.findAll();
 
         allAfterInsert.removeAll(allBeforeInsert);
 
         Assert.assertEquals(allAfterInsert.size(), 1);
         Assert.assertEquals(allAfterInsert.get(0).getName(), testName);
     }
-
 }

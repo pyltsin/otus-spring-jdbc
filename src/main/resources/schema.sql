@@ -4,6 +4,11 @@ DROP TABLE IF EXISTS genre;
 DROP TABLE IF EXISTS book;
 DROP TABLE IF EXISTS author;
 
+DROP TABLE IF EXISTS acl_sid;
+DROP TABLE IF EXISTS acl_class;
+DROP TABLE IF EXISTS acl_object_identity;
+DROP TABLE IF EXISTS acl_entry;
+
 CREATE table genre (
   id varchar(2000) primary key
 );
