@@ -4,6 +4,8 @@ import com.otus.jdbc.model.Author;
 import com.otus.jdbc.repository.AuthorDataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -12,6 +14,9 @@ import java.util.List;
 @Service
 @Transactional
 public class AuthorServiceImpl implements AuthorService {
+
+    @Autowired
+    private MutableAclService aclService;
 
     private final AuthorDataJpaRepository authorRepository;
 
@@ -33,7 +38,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author insert(Author author) {
-        return authorRepository.save(author);
+        final Author save = authorRepository.save(author);
+
+        final ObjectIdentityImpl objectIdentity = new ObjectIdentityImpl(Author.class, save.getId());
+        aclService.createAcl(objectIdentity);
+        return save;
     }
 
     @Override
@@ -45,6 +54,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void delete(int id) {
+        final ObjectIdentityImpl objectIdentity = new ObjectIdentityImpl(Author.class, id);
+        aclService.deleteAcl(objectIdentity, true);
         authorRepository.deleteById(id);
     }
 
