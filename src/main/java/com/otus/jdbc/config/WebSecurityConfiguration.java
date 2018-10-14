@@ -25,6 +25,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/static/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -73,7 +74,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
             return Optional.ofNullable(usersByName.get(username))
-                    .map(u->
+                    .map(u ->
                             User.builder()
                                     .username(u.getUsername())
                                     .password(u.getPassword())

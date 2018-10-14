@@ -1,3 +1,4 @@
+
 spring:
   jpa:
     database: h2
@@ -16,3 +17,21 @@ logging:
         SQL: trace
         type: trace
         generate_statistics: trace
+  file: 'test.log'
+server:
+  port: 8082
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+      ##включается автоматически, так как добавлен logfile
+#    logfile:
+#      enabled: true
+#      external-file:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "metrics", "logfile"]
