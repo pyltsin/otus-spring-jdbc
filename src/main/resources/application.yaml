@@ -3,8 +3,7 @@ spring:
     mongodb:
       authentication-database: admin
       database: test
-      host: localhost
-      port: 27017
+      host: mongo
 logging:
   level:
     org:
