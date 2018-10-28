@@ -26,6 +26,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/actuator/**").permitAll()
+                .antMatchers("//hystrix").permitAll()
+                .antMatchers("//hystrix.stream").permitAll()
                 .antMatchers("/static/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

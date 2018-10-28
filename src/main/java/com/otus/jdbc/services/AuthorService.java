@@ -8,6 +8,8 @@ public interface AuthorService {
 
     List<Author> getAll();
 
+    abstract List<Author> getAllFromArchive();
+
     Author get(int id);
 
     Author insert(Author author);
